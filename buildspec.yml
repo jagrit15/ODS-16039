@@ -5,6 +5,10 @@ phases:
     commands:
       - echo Installing dependencies...
       - pip install --upgrade awscli
+      - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.8.2/terraform_1.8.2_linux_amd64.zip
+      - unzip terraform.zip
+      - mv terraform /usr/local/bin/
+      - terraform -version
       - chmod +x send_email.sh
 
   pre_build:
