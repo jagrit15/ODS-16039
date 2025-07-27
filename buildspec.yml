@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing dependencies...
+      - pip install --upgrade awscli
+      - chmod +x send_email.sh
+
+  pre_build:
+    commands:
+      - terraform init
+
+  build:
+    commands:
+      - |
+        echo "Running Terraform Plan"
+        if ! terraform plan -out=tfplan; then
+          ./send_email.sh "Terraform Plan Failed" "Terraform plan failed"
+          exit 1
+        fi
+
+  post_build:
+    commands:
+      - |
+        echo "Applying Terraform"
+        if terraform apply -auto-approve tfplan; then
+          terraform output > tf_output.txt
+          ./send_email.sh "Terraform Success" "$(cat tf_output.txt)"
+        else
+          ./send_email.sh "Terraform Apply Failed" "Terraform apply failed"
+          exit 1
+        fi
