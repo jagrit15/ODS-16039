@@ -1,1 +1,1 @@
-bucket_name = "my-static-site-bucket-${random_id.suffix.hex}"
+bucket_name = "my-jagrits-bucket"
