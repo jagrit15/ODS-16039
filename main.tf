@@ -2,8 +2,12 @@ provider "aws" {
   region = var.region
 }
 
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
 resource "aws_s3_bucket" "static_site" {
-  bucket = var.bucket_name
+  bucket = "${var.bucket_name}-${random_id.suffix.hex}"
 
   tags = {
     Name = "StaticSiteBucket"
@@ -24,8 +28,15 @@ resource "aws_s3_bucket_website_configuration" "website" {
 
 resource "aws_cloudfront_distribution" "cdn" {
   origin {
-    domain_name = aws_s3_bucket.static_site.website_endpoint
+    domain_name = "${aws_s3_bucket.static_site.bucket}.s3-website-${var.region}.amazonaws.com"
     origin_id   = "S3Origin"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
   }
 
   enabled             = true
@@ -47,14 +58,14 @@ resource "aws_cloudfront_distribution" "cdn" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
-  viewer_certificate {
-    cloudfront_default_certificate = true
-  }
-
   restrictions {
     geo_restriction {
       restriction_type = "none"
     }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
   }
 
   tags = {
