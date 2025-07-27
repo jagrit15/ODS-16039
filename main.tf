@@ -4,15 +4,21 @@ provider "aws" {
 
 resource "aws_s3_bucket" "static_site" {
   bucket = var.bucket_name
-  acl    = "public-read"
-
-  website {
-    index_document = "index.html"
-    error_document = "error.html"
-  }
 
   tags = {
     Name = "StaticSiteBucket"
+  }
+}
+
+resource "aws_s3_bucket_website_configuration" "website" {
+  bucket = aws_s3_bucket.static_site.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "error.html"
   }
 }
 
