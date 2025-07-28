@@ -1,9 +1,15 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_REGION: "us-east-1"
+
 phases:
   install:
+    runtime-versions:
+      python: 3.11
     commands:
-      - echo Installing dependencies...
+      - echo Installing AWS CLI and Terraform...
       - pip install --upgrade awscli
       - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.8.2/terraform_1.8.2_linux_amd64.zip
       - unzip terraform.zip
@@ -13,25 +19,39 @@ phases:
 
   pre_build:
     commands:
+      - echo Initializing Terraform
       - terraform init
 
   build:
     commands:
+      - echo Planning Terraform
       - |
-        echo "Running Terraform Plan"
-        if ! terraform plan -out=tfplan; then
-          ./send_email.sh "Terraform Plan Failed" "Terraform plan failed"
+        terraform plan -out=tfplan > plan_output.txt 2>&1
+        PLAN_EXIT_CODE=$?
+        CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/?region=$AWS_REGION"
+        if [ $PLAN_EXIT_CODE -ne 0 ]; then
+          echo "Terraform plan failed" > error.txt
+          tail -n 30 plan_output.txt >> error.txt
+          echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> error.txt
+          ./send_email.sh "Terraform Plan Failed" "error.txt"
           exit 1
         fi
 
   post_build:
     commands:
+      - echo Applying Terraform
       - |
-        echo "Applying Terraform"
-        if terraform apply -auto-approve tfplan; then
-          terraform output > tf_output.txt
-          ./send_email.sh "Terraform Success" "$(cat tf_output.txt)"
+        terraform apply -auto-approve tfplan > apply_output.txt 2>&1
+        APPLY_EXIT_CODE=$?
+        CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/?region=$AWS_REGION"
+        if [ $APPLY_EXIT_CODE -eq 0 ]; then
+          terraform output > email_body.txt
+          echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> email_body.txt
+          ./send_email.sh "Terraform Apply Succeeded" "email_body.txt"
         else
-          ./send_email.sh "Terraform Apply Failed" "Terraform apply failed"
+          echo "Terraform apply failed" > error.txt
+          tail -n 30 apply_output.txt >> error.txt
+          echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> error.txt
+          ./send_email.sh "Terraform Apply Failed" "error.txt"
           exit 1
         fi
