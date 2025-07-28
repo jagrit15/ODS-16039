@@ -6,6 +6,8 @@ TO_EMAIL="jagritpandeer1969@gmail.com"
 FROM_EMAIL="jpandeer15@gmail.com"
 REGION="us-east-1"
 
+BODY=$(<"$BODY_FILE")
+
 aws ses send-email \
   --region "$REGION" \
   --from "$FROM_EMAIL" \
