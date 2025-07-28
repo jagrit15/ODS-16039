@@ -46,6 +46,7 @@ phases:
         CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/?region=$AWS_REGION"
         if [ $APPLY_EXIT_CODE -eq 0 ]; then
           terraform output > email_body.txt
+          echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> ...
           echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> email_body.txt
           ./send_email.sh "Terraform Apply Succeeded" "email_body.txt"
         else
