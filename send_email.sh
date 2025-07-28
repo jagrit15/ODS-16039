@@ -12,4 +12,4 @@ aws ses send-email \
     --region "$REGION" \
     --from "$FROM_EMAIL" \
     --destination "ToAddresses=$TO_EMAIL" \
-    --message "Subject={Data=\"$SUBJECT\",Charset=utf-8},Body={Text={Data=\"$BODY_CONTENT\",Charset=utf-8}}"
+    --message "Subject={Data=\"$SUBJECT\",Charset=utf-8},Body={Text={Data=\"$BODY_CONTENT\",Charset=utf-8\"}}"
