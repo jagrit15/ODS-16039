@@ -1,21 +1,35 @@
 #!/bin/bash
 
 SUBJECT="$1"
-BODY="$2"
-TO_EMAIL="jagritpandeer1969@gmail.com"
+BODY_FILE="$2"
+TO_EMAIL="Jagritpandeer1969@gmail.com"
 FROM_EMAIL="jpandeer15@gmail.com"
 REGION="us-east-1"
 
-# Read file safely into variable
 BODY=$(cat "$BODY_FILE")
 
-# Debug log to verify body (remove after testing)
-echo "Email body content:"
-echo "$BODY"
+# Create JSON payload
+cat > email.json <<EOF
+{
+  "Source": "$FROM_EMAIL",
+  "Destination": {
+    "ToAddresses": ["$TO_EMAIL"]
+  },
+  "Message": {
+    "Subject": {
+      "Data": "$SUBJECT",
+      "Charset": "UTF-8"
+    },
+    "Body": {
+      "Text": {
+        "Data": "$BODY",
+        "Charset": "UTF-8"
+      }
+    }
+  }
+}
+EOF
 
-# Send the email using AWS SES
-aws ses send-email \
-  --region "$REGION" \
-  --from "$FROM_EMAIL" \
-  --destination "ToAddresses=$TO_EMAIL" \
-  --message "Subject={Data=\"$SUBJECT\",Charset=utf-8},Body={Text={Data=\"$(echo "$BODY" | sed 's/"/\\"/g')\",Charset=utf-8}}"
+cat email.json  # Debug: Check contents
+
+aws ses send-email --region "$REGION" --cli-input-json file://email.json
