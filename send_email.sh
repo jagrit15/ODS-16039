@@ -1,15 +1,13 @@
 #!/bin/bash
 
 SUBJECT="$1"
-BODY_FILE="$2"
+BODY="$2"
 TO_EMAIL="jagritpandeer1969@gmail.com"
-FROM_EMAIL="jpandeer15@gmail.com"
+FROM_EMAIL="jagritpandeer1969@gmail.com"
 REGION="us-east-1"
 
-BODY=$(<"$BODY_FILE")
-
 aws ses send-email \
-  --region "$REGION" \
-  --from "$FROM_EMAIL" \
-  --destination "ToAddresses=$TO_EMAIL" \
-  --message "Subject={Data=\"$SUBJECT\",Charset=utf-8},Body={Text={Data=\"$BODY\",Charset=utf-8}}"
+    --region "$REGION" \
+    --from "$FROM_EMAIL" \
+    --destination "ToAddresses=$TO_EMAIL" \
+    --message "Subject={Data=$SUBJECT,Charset=utf8},Body={Text={Data=$BODY,Charset=utf8}}"
