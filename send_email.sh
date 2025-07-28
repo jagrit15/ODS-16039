@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SUBJECT="$1"
-BODY_FILE="$2"
+BODY="$2"
 TO_EMAIL="jagritpandeer1969@gmail.com"
 FROM_EMAIL="jagritpandeer1969@gmail.com"
 REGION="us-east-1"
@@ -12,7 +12,7 @@ REGION=${REGION:-"us-east-1"}
 BUILD_ID=${CODEBUILD_BUILD_ID}
 BUILD_URL="https://${REGION}.console.aws.amazon.com/codesuite/codebuild/projects/${CODEBUILD_PROJECT_NAME}/build/${BUILD_ID}/log?region=${REGION}"
 
-BODY=$(<"$BODY_FILE")
+BODY=$(<"$BODY")
 BODY="$BODY
 
 View logs: $BUILD_URL"
