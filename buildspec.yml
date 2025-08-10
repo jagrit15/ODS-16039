@@ -39,7 +39,7 @@ phases:
             echo ""
             echo "Full CodeBuild logs: ${CODEBUILD_LOG_URL}"
           } > error.txt
-          ./send_sns.sh "Terraform Plan FAILED: ${CODEBUILD_PROJECT_NAME}" error.txt
+          ./send_ses.sh "Terraform Plan FAILED: ${CODEBUILD_PROJECT_NAME}" error.txt
           exit 1
         fi
 
@@ -53,7 +53,7 @@ phases:
         if [ $APPLY_EXIT_CODE -eq 0 ]; then
           terraform output -no-color > email_body.txt
           echo -e "\n\nCodeBuild Logs: ${CODEBUILD_LOG_URL}" >> email_body.txt
-          ./send_sns.sh "Terraform Apply SUCCEEDED: ${CODEBUILD_PROJECT_NAME}" email_body.txt
+          ./send_ses.sh "Terraform Apply SUCCEEDED: ${CODEBUILD_PROJECT_NAME}" email_body.txt
         else
           {
             echo "Terraform apply failed for project: ${CODEBUILD_PROJECT_NAME}"
@@ -63,6 +63,6 @@ phases:
             echo ""
             echo "Full CodeBuild logs: ${CODEBUILD_LOG_URL}"
           } > error.txt
-          ./send_sns.sh "Terraform Apply FAILED: ${CODEBUILD_PROJECT_NAME}" error.txt
+          ./send_ses.sh "Terraform Apply FAILED: ${CODEBUILD_PROJECT_NAME}" error.txt
           exit 1
         fi
