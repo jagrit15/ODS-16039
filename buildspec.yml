@@ -1,7 +1,9 @@
+version: 0.2
+
 env:
   variables:
     AWS_REGION: "us-east-1"
-    SNS_TOPIC_ARN: "arn:aws:sns:us-east-1:ACCOUNT_ID:codepipeline-alerts"  # or set in project
+    SNS_TOPIC_ARN: "arn:aws:sns:us-east-1:010438474962:mail"  # replace <ACCOUNT_ID>
 
 phases:
   install:
@@ -23,21 +25,21 @@ phases:
 
   build:
     commands:
-      - echo Planning Terraform
+      - echo "Planning Terraform"
       - |
         terraform plan -out=tfplan > plan_output.txt 2>&1
         PLAN_EXIT_CODE=$?
-        CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/?region=$AWS_REGION"
+        CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/${CODEBUILD_PROJECT_NAME}/build/${CODEBUILD_BUILD_ID}/?region=${AWS_REGION}"
         if [ $PLAN_EXIT_CODE -ne 0 ]; then
           {
-            echo "Terraform plan failed for project: $CODEBUILD_PROJECT_NAME"
+            echo "Terraform plan failed for project: ${CODEBUILD_PROJECT_NAME}"
             echo ""
             echo "Last 200 lines from plan output:"
             tail -n 200 plan_output.txt
             echo ""
-            echo "Full CodeBuild logs: $CODEBUILD_LOG_URL"
+            echo "Full CodeBuild logs: ${CODEBUILD_LOG_URL}"
           } > error.txt
-          ./send_sns.sh "Terraform Plan FAILED: $CODEBUILD_PROJECT_NAME" error.txt
+          ./send_sns.sh "Terraform Plan FAILED: ${CODEBUILD_PROJECT_NAME}" error.txt
           exit 1
         fi
 
@@ -47,20 +49,20 @@ phases:
       - |
         terraform apply -no-color -auto-approve tfplan > apply_output.txt 2>&1
         APPLY_EXIT_CODE=$?
-        CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/?region=$AWS_REGION"
+        CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/${CODEBUILD_PROJECT_NAME}/build/${CODEBUILD_BUILD_ID}/?region=${AWS_REGION}"
         if [ $APPLY_EXIT_CODE -eq 0 ]; then
           terraform output -no-color > email_body.txt
-          echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> email_body.txt
-          ./send_sns.sh "Terraform Apply SUCCEEDED: $CODEBUILD_PROJECT_NAME" email_body.txt
+          echo -e "\n\nCodeBuild Logs: ${CODEBUILD_LOG_URL}" >> email_body.txt
+          ./send_sns.sh "Terraform Apply SUCCEEDED: ${CODEBUILD_PROJECT_NAME}" email_body.txt
         else
           {
-            echo "Terraform apply failed for project: $CODEBUILD_PROJECT_NAME"
+            echo "Terraform apply failed for project: ${CODEBUILD_PROJECT_NAME}"
             echo ""
             echo "Last 200 lines from apply output:"
             tail -n 200 apply_output.txt
             echo ""
-            echo "Full CodeBuild logs: $CODEBUILD_LOG_URL"
+            echo "Full CodeBuild logs: ${CODEBUILD_LOG_URL}"
           } > error.txt
-          ./send_sns.sh "Terraform Apply FAILED: $CODEBUILD_PROJECT_NAME" error.txt
+          ./send_sns.sh "Terraform Apply FAILED: ${CODEBUILD_PROJECT_NAME}" error.txt
           exit 1
         fi
