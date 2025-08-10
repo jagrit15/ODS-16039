@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     AWS_REGION: "us-east-1"
-    SES_FROM: "jpandeer15@gmail.com"             # Verified in SES
+    SES_FROM: "jagritpandeer1969@gmail.com"             # Verified in SES
     SES_TO: "jagritpandeer1969@gmail.com"         # Verified in SES
 
 phases:
