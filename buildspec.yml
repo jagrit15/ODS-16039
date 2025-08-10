@@ -38,20 +38,20 @@ phases:
         fi
 
   post_build:
-  commands:
-    - echo "Applying Terraform"
-    - |
-      terraform apply -no-color -auto-approve tfplan > apply_output.txt 2>&1
-      APPLY_EXIT_CODE=$?
-      CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/?region=$AWS_REGION"
-      if [ $APPLY_EXIT_CODE -eq 0 ]; then
-        terraform output -no-color > email_body.txt
-        echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> email_body.txt
-        ./send_email.sh "Terraform Apply Succeeded" "email_body.txt"
-      else
-        echo "Terraform apply failed" > error.txt
-        tail -n 30 apply_output.txt >> error.txt
-        echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> error.txt
-        ./send_email.sh "Terraform Apply Failed" "error.txt"
-        exit 1
-      fi
+    commands:
+      - echo "Applying Terraform"
+      - |
+        terraform apply -no-color -auto-approve tfplan > apply_output.txt 2>&1
+        APPLY_EXIT_CODE=$?
+        CODEBUILD_LOG_URL="https://console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/?region=$AWS_REGION"
+        if [ $APPLY_EXIT_CODE -eq 0 ]; then
+          terraform output -no-color > email_body.txt
+          echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> email_body.txt
+          ./send_email.sh "Terraform Apply Succeeded" "email_body.txt"
+        else
+          echo "Terraform apply failed" > error.txt
+          tail -n 30 apply_output.txt >> error.txt
+          echo -e "\n\nCodeBuild Logs: $CODEBUILD_LOG_URL" >> error.txt
+          ./send_email.sh "Terraform Apply Failed" "error.txt"
+          exit 1
+        fi
