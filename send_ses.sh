@@ -3,7 +3,7 @@ set -e
 
 # Variables
 AWS_REGION="us-east-1"
-FROM_EMAIL="jpandeer15@gmail.com"     # Must be a verified SES identity
+FROM_EMAIL="jagritpandeer1969@gmail.com"     # Must be a verified SES identity
 TO_EMAIL="jagritpandeer1969@gmail.com" # Must also be verified in SES (sandbox mode)
 SUBJECT="CodeBuild Notification"
 BODY_TEXT="Hello! This is a test email from AWS CodeBuild using SES."
