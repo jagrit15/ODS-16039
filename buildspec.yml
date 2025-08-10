@@ -3,8 +3,8 @@ version: 0.2
 env:
   variables:
     AWS_REGION: "us-east-1"
-    SES_FROM: "Jpandeer15@gmail.com"      # Verified SES email
-    SES_TO: "Jagritpandeer1969@gmail.com"      # Verified SES email
+    SES_FROM: "jpandeer15@gmail.com"      # Verified SES email
+    SES_TO: "jagritpandeer1969@gmail.com"      # Verified SES email
 
 phases:
   install:
