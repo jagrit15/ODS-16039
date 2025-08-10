@@ -3,7 +3,8 @@ version: 0.2
 env:
   variables:
     AWS_REGION: "us-east-1"
-    SNS_TOPIC_ARN: "arn:aws:sns:us-east-1:010438474962:mail"  # replace <ACCOUNT_ID>
+    SES_FROM: "Jpandeer15@gmail.com"      # Verified SES email
+    SES_TO: "Jagritpandeer1969@gmail.com"      # Verified SES email
 
 phases:
   install:
@@ -16,7 +17,7 @@ phases:
       - unzip terraform.zip
       - mv terraform /usr/local/bin/
       - terraform -version
-      - chmod +x send_sns.sh
+      - chmod +x send_ses.sh
 
   pre_build:
     commands:
