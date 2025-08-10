@@ -2,8 +2,8 @@
 # send_ses.sh <subject> <body-file>
 SUBJECT="$1"
 BODY_FILE="$2"
-FROM_EMAIL="Jpandeer15@gmail.com"    # must be verified in SES
-TO_EMAIL="Jagritpandeer1969@gmail.com"          # must be verified unless SES is in production
+FROM_EMAIL="jpandeer15@gmail.com"    # must be verified in SES
+TO_EMAIL="jagritpandeer1969@gmail.com"          # must be verified unless SES is in production
 
 aws ses send-email \
     --from "$FROM_EMAIL" \
