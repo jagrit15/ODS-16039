@@ -1,1 +1,1 @@
-bucket_name = "my-jagrits-bucket@#$"
+bucket_name = "my-jagrits-bucket123456878"
